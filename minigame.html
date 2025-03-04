@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Jake's Minigame</title>
+  <style>
+    body {
+      background-color: black;
+      color: white;
+      font-family: 'Courier New', monospace;
+      text-align: center;
+      margin: 0;
+      padding: 0;
+    }
+    h1 {
+      margin-top: 20px;
+    }
+    .game-container {
+      display: grid;
+      grid-template-columns: repeat(5, 60px);
+      grid-gap: 10px;
+      justify-content: center;
+      margin-top: 30px;
+    }
+    .cell {
+      width: 60px;
+      height: 60px;
+      border-radius: 10px;
+      cursor: pointer;
+      border: 2px solid #fff;
+    }
+    .diamond-1 { background-color: red; }
+    .diamond-2 { background-color: blue; }
+    .diamond-3 { background-color: yellow; }
+    .diamond-4 { background-color: green; }
+    .diamond-5 { background-color: purple; }
+    #movesCounter {
+      font-size: 24px;
+      margin-top: 20px;
+    }
+  </style>
+</head>
+<body>
+  <h1>Jake's Minigame</h1>
+  <div id="gameContainer" class="game-container"></div>
+  <div id="movesCounter">Matches: 10</div>
+  
+  <script>
+    const colors = ["diamond-1", "diamond-2", "diamond-3", "diamond-4", "diamond-5"];
+    const boardSize = 5;
+    let moves = 0;
+    let selectedCell = null;
+
+    function createBoard() {
+      const gameContainer = document.getElementById('gameContainer');
+      gameContainer.innerHTML = "";
+      for (let row = 0; row < boardSize; row++) {
+        for (let col = 0; col < boardSize; col++) {
+          const cell = document.createElement('div');
+          const randomColorClass = colors[Math.floor(Math.random() * colors.length)];
+          cell.className = cell ${randomColorClass};
+          cell.dataset.row = row;
+          cell.dataset.col = col;
+          cell.addEventListener('click', () => cellClicked(cell));
+          gameContainer.appendChild(cell);
+        }
+      }
+    }
+
+    function cellClicked(cell) {
+      if (!selectedCell) {
+        // Selectăm prima celulă
+        selectedCell = cell;
+        cell.style.outline = "3px solid white";
+      } else {
+        // Dacă se dă click pe aceeași celulă, deselectăm
+        if (cell === selectedCell) {
+          cell.style.outline = "";
+          selectedCell = null;
+          return;
+        }
+        // Se schimbă culorile între celulele selectate
+        swapCells(selectedCell, cell);
+        selectedCell.style.outline = "";
+        selectedCell = null;
+        moves++;
+        document.getElementById('movesCounter').innerText = Mutări: ${moves}/10;
+        if (moves >= 10) {
+          setTimeout(() => {
+            window.location.href = "https://drive.google.com/file/d/14v8fGnHlj1YLdRRtcT3ZnVudX_QerjTf/view?usp=drive_link"; // Înlocuiește cu linkul tău real
+          }, 1000);
+        }
+      }
+    }
+
+    function swapCells(cell1, cell2) {
+      const tempClass = cell1.className;
+      cell1.className = cell2.className;
+      cell2.className = tempClass;
+    }
+
+    createBoard();
+  </script>
+</body>
+</html>
