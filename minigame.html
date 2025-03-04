@@ -44,43 +44,50 @@
 <body>
   <h1>Jake's Minigame</h1>
   <div id="gameContainer" class="game-container"></div>
-  <div id="movesCounter">Matches: 10</div>
+  <div id="movesCounter">Moves: 0/10</div>
   
   <script>
     const colors = ["diamond-1", "diamond-2", "diamond-3", "diamond-4", "diamond-5"];
     const boardSize = 5;
     let moves = 0;
     let selectedCell = null;
-
+    
+    // Funcția pentru crearea tablei de joc
     function createBoard() {
       const gameContainer = document.getElementById('gameContainer');
+      if (!gameContainer) {
+        console.error("Elementul gameContainer nu a fost găsit!");
+        return;
+      }
       gameContainer.innerHTML = "";
       for (let row = 0; row < boardSize; row++) {
         for (let col = 0; col < boardSize; col++) {
           const cell = document.createElement('div');
+          // Setăm clasele: "cell" și clasa de culoare
+          cell.classList.add("cell");
           const randomColorClass = colors[Math.floor(Math.random() * colors.length)];
-          cell.className = cell ${randomColorClass};
+          cell.classList.add(randomColorClass);
           cell.dataset.row = row;
           cell.dataset.col = col;
-          cell.addEventListener('click', () => cellClicked(cell));
+          cell.addEventListener('click', function() { cellClicked(cell); });
           gameContainer.appendChild(cell);
         }
       }
     }
-
+    
+    // Funcția apelată la click pe o celulă
     function cellClicked(cell) {
       if (!selectedCell) {
-        // Selectăm prima celulă
         selectedCell = cell;
         cell.style.outline = "3px solid white";
       } else {
-        // Dacă se dă click pe aceeași celulă, deselectăm
+        // Dacă se face click pe aceeași celulă, deselectăm
         if (cell === selectedCell) {
           cell.style.outline = "";
           selectedCell = null;
           return;
         }
-        // Se schimbă culorile între celulele selectate
+        // Schimbăm culorile între celulele selectate
         swapCells(selectedCell, cell);
         selectedCell.style.outline = "";
         selectedCell = null;
@@ -88,18 +95,33 @@
         document.getElementById('movesCounter').innerText = Mutări: ${moves}/10;
         if (moves >= 10) {
           setTimeout(() => {
-            window.location.href = "https://drive.google.com/file/d/14v8fGnHlj1YLdRRtcT3ZnVudX_QerjTf/view?usp=drive_link"; // Înlocuiește cu linkul tău real
+            // Redirecționează către fișierul de Google Drive – înlocuiește linkul cu cel corect
+            window.location.href = "https://drive.google.com/file/d/14v8fGnHlj1YLdRRtcT3ZnVudX_QerjTf/view?usp=drive_link";
           }, 1000);
         }
       }
     }
-
+    
+    // Funcția de schimbare a culorilor între două celule
     function swapCells(cell1, cell2) {
-      const tempClass = cell1.className;
-      cell1.className = cell2.className;
-      cell2.className = tempClass;
+      // Extragem clasa de culoare (presupunând că este singura clasă în plus față de "cell")
+      let cell1Color, cell2Color;
+      cell1.classList.forEach(cls => {
+        if (cls !== "cell") cell1Color = cls;
+      });
+      cell2.classList.forEach(cls => {
+        if (cls !== "cell") cell2Color = cls;
+      });
+      
+      // Eliminăm clasa existentă și adăugăm noua clasă
+      cell1.classList.remove(cell1Color);
+      cell1.classList.add(cell2Color);
+      
+      cell2.classList.remove(cell2Color);
+      cell2.classList.add(cell1Color);
     }
-
+    
+    // Inițializăm tabla de joc
     createBoard();
   </script>
 </body>
