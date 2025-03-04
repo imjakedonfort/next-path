@@ -7,122 +7,96 @@
   <style>
     body {
       background-color: black;
-      color: white;
-      font-family: 'Courier New', monospace;
-      text-align: center;
       margin: 0;
-      padding: 0;
+      height: 100vh;
+      overflow: hidden;
+      font-family: 'Courier New', monospace;
+      color: #0F0;
+      position: relative;
     }
-    h1 {
+    #instructions {
+      text-align: center;
       margin-top: 20px;
-    }
-    .game-container {
-      display: grid;
-      grid-template-columns: repeat(5, 60px);
-      grid-gap: 10px;
-      justify-content: center;
-      margin-top: 30px;
-    }
-    .cell {
-      width: 60px;
-      height: 60px;
-      border-radius: 10px;
-      cursor: pointer;
-      border: 2px solid #fff;
-    }
-    .diamond-1 { background-color: red; }
-    .diamond-2 { background-color: blue; }
-    .diamond-3 { background-color: yellow; }
-    .diamond-4 { background-color: green; }
-    .diamond-5 { background-color: purple; }
-    #movesCounter {
       font-size: 24px;
-      margin-top: 20px;
+      z-index: 2;
+      position: relative;
+    }
+    #clickCounter {
+      text-align: center;
+      margin-top: 10px;
+      font-size: 20px;
+      z-index: 2;
+      position: relative;
+    }
+    .target {
+      position: absolute;
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      cursor: pointer;
+      box-shadow: 0 0 10px rgba(255, 255, 255, 0.8);
     }
   </style>
 </head>
 <body>
-  <h1>Jake's Minigame</h1>
-  <div id="gameContainer" class="game-container"></div>
-  <div id="movesCounter">Moves: 0/10</div>
+  <div id="instructions">Click on the target 10 times to unlock it!</div>
+  <div id="clickCounter">Clicks: 0/10</div>
   
   <script>
-    const colors = ["diamond-1", "diamond-2", "diamond-3", "diamond-4", "diamond-5"];
-    const boardSize = 5;
-    let moves = 0;
-    let selectedCell = null;
-    
-    // Funcția pentru crearea tablei de joc
-    function createBoard() {
-      const gameContainer = document.getElementById('gameContainer');
-      if (!gameContainer) {
-        console.error("Elementul gameContainer nu a fost găsit!");
-        return;
+    let clicks = 0;
+    let target = null;
+    let targetTimeout = null;
+
+    // Funcția pentru a genera o țintă la o poziție aleatorie
+    function spawnTarget() {
+      // Dacă există o țintă, o eliminăm
+      if (target && document.body.contains(target)) {
+        target.remove();
       }
-      gameContainer.innerHTML = "";
-      for (let row = 0; row < boardSize; row++) {
-        for (let col = 0; col < boardSize; col++) {
-          const cell = document.createElement('div');
-          // Setăm clasele: "cell" și clasa de culoare
-          cell.classList.add("cell");
-          const randomColorClass = colors[Math.floor(Math.random() * colors.length)];
-          cell.classList.add(randomColorClass);
-          cell.dataset.row = row;
-          cell.dataset.col = col;
-          cell.addEventListener('click', function() { cellClicked(cell); });
-          gameContainer.appendChild(cell);
-        }
-      }
-    }
-    
-    // Funcția apelată la click pe o celulă
-    function cellClicked(cell) {
-      if (!selectedCell) {
-        selectedCell = cell;
-        cell.style.outline = "3px solid white";
-      } else {
-        // Dacă se face click pe aceeași celulă, deselectăm
-        if (cell === selectedCell) {
-          cell.style.outline = "";
-          selectedCell = null;
-          return;
-        }
-        // Schimbăm culorile între celulele selectate
-        swapCells(selectedCell, cell);
-        selectedCell.style.outline = "";
-        selectedCell = null;
-        moves++;
-        document.getElementById('movesCounter').innerText = Mutări: ${moves}/10;
-        if (moves >= 10) {
+      
+      // Creăm elementul țintă
+      target = document.createElement("div");
+      target.classList.add("target");
+      
+      // Atribuim o culoare aleatorie (alegem din 5 culori)
+      const colors = ["red", "blue", "yellow", "green", "purple"];
+      let randomColor = colors[Math.floor(Math.random() * colors.length)];
+      target.style.backgroundColor = randomColor;
+      
+      // Stabilim o poziție aleatorie în fereastră (se ia în calcul dimensiunea țintei)
+      const maxX = window.innerWidth - 50;
+      const maxY = window.innerHeight - 50;
+      const posX = Math.floor(Math.random() * maxX);
+      const posY = Math.floor(Math.random() * maxY);
+      target.style.left = posX + "px";
+      target.style.top = posY + "px";
+      
+      // Adăugăm evenimentul de click
+      target.addEventListener("click", function(e) {
+        e.stopPropagation();
+        clicks++;
+        document.getElementById("clickCounter").innerText = "Clickuri: " + clicks + "/10";
+        clearTimeout(targetTimeout);
+        if (clicks >= 10) {
           setTimeout(() => {
-            // Redirecționează către fișierul de Google Drive – înlocuiește linkul cu cel corect
-            window.location.href = "https://drive.google.com/file/d/14v8fGnHlj1YLdRRtcT3ZnVudX_QerjTf/view?usp=drive_link";
+            window.location.href = "https://drive.google.com/file/d/14v8fGnHlj1YLdRRtcT3ZnVudX_QerjTf/view?usp=drive_link"; // Înlocuiește cu linkul tău real
           }, 1000);
+        } else {
+          spawnTarget();
         }
-      }
-    }
-    
-    // Funcția de schimbare a culorilor între două celule
-    function swapCells(cell1, cell2) {
-      // Extragem clasa de culoare (presupunând că este singura clasă în plus față de "cell")
-      let cell1Color, cell2Color;
-      cell1.classList.forEach(cls => {
-        if (cls !== "cell") cell1Color = cls;
-      });
-      cell2.classList.forEach(cls => {
-        if (cls !== "cell") cell2Color = cls;
       });
       
-      // Eliminăm clasa existentă și adăugăm noua clasă
-      cell1.classList.remove(cell1Color);
-      cell1.classList.add(cell2Color);
+      // Adăugăm ținta în document
+      document.body.appendChild(target);
       
-      cell2.classList.remove(cell2Color);
-      cell2.classList.add(cell1Color);
+      // Dacă ținta nu este apăsată în 2 secunde, regenerăm o nouă țintă
+      targetTimeout = setTimeout(() => {
+        spawnTarget();
+      }, 2000);
     }
-    
-    // Inițializăm tabla de joc
-    createBoard();
+
+    // Pornim jocul prin generarea primei ținte
+    spawnTarget();
   </script>
 </body>
 </html>
